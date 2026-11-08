@@ -16,7 +16,9 @@ Install: Komble → Plugins, or
   speed (then download and upload). *Show in the bar* is ewe's own switch
   (Komble → Plugins → System monitor, or `ewe-plugin bar ewe.sysmon off`).
 - **The card** — click the readout: CPU with the last minute as a line,
-  memory ("6.1 GB of 15.5 GB", how much is in swap), and the internet:
+  memory ("6.1 GB of 15.5 GB", how much is in swap — since 2.0.1 the graphics
+  driver's reclaimable cache counts as free, as it is: on an Intel laptop it
+  made 4.5 GB look used that no program held), and the internet:
   download, upload and the connection they go through ("Wi-Fi · home",
   "Ethernet", "VPN", "Offline"). The cog opens the plugin in Komble.
 - **On the desktop** — the same numbers as a desktop widget. Off until you
