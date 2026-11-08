@@ -40,7 +40,8 @@ tile is gone); the readout opens its own card instead.
 
 Nothing is sampled unless something shows it: the readout while its bar is
 up, the card while it is open, the widget while it is on the desktop. Then
-every 1.5 s, or every 3 s on battery, one `sh` process (`sample.sh`) reads
+every 1.5 s while the card or the widget is up (3 s with the bar readout
+alone; both doubled on battery), one `sh` process (`sample.sh`) reads
 `/proc/stat`, `/proc/meminfo`, the default route (`/proc/net/route`, lowest
 metric), that interface's byte counters (`/proc/net/dev`) and the clock
 (`/proc/uptime`), and prints one JSON object. The speed is the change in

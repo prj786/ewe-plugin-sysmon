@@ -52,6 +52,13 @@ prev_tx="${5:-}"
 prev_t="${6:-}"
 
 fail() { printf '{"ok":false,"error":"%s"}\n' "$1"; exit 0; }
+# a 0..1000 per-mille as "0.123" in $R — a function, not $(printf …): every
+# command substitution is a fork, and this runs every few seconds all day
+permille() {
+    _f=$(( $1 % 1000 ))
+    case "$_f" in ?) _f="00$_f" ;; ??) _f="0$_f" ;; esac
+    R="$(( $1 / 1000 )).$_f"
+}
 # a non-negative decimal integer (no sign, no hex, no leading garbage)
 isnum() { case "$1" in ""|*[!0-9]*) return 1 ;; *) return 0 ;; esac; }
 
@@ -82,7 +89,7 @@ if isnum "$prev_total" && isnum "$prev_idle"; then
         busy=$(( (dt - di) * 1000 / dt ))
         [ "$busy" -lt 0 ] && busy=0
         [ "$busy" -gt 1000 ] && busy=1000
-        cpu=$(printf '%d.%03d' $(( busy / 1000 )) $(( busy % 1000 )))
+        permille "$busy"; cpu=$R
     fi
 fi
 
@@ -112,7 +119,7 @@ if [ "$mt" -gt 0 ]; then
     [ "$mused" -lt 0 ] && mused=0
     used=$(( mused * 1000 / mt ))
     [ "$used" -gt 1000 ] && { used=1000; mused=$mt; }
-    mem=$(printf '%d.%03d' $(( used / 1000 )) $(( used % 1000 )))
+    permille "$used"; mem=$R
 fi
 swused=$(( swt - swf ))
 [ "$swused" -lt 0 ] && swused=0
@@ -183,8 +190,7 @@ if [ -n "$ifc" ] && isnum "$rx" && isnum "$tx" && isnum "$t"; then
             upr=$(( (tx - prev_tx) * 100 / dts ))
         fi
     fi
-    net=$(printf '{"if":"%s","kind":"%s","rx":%s,"tx":%s,"t":%s,"down":%s,"up":%s}' \
-        "$ifj" "$kind" "$rx" "$tx" "$t" "$down" "$upr")
+    net="{\"if\":\"$ifj\",\"kind\":\"$kind\",\"rx\":$rx,\"tx\":$tx,\"t\":$t,\"down\":$down,\"up\":$upr}"
 fi
 
 printf '{"ok":true,"total":%d,"idle":%d,"cpu":%s,"cores":%d,"mem":%s,"memTotal":%d,"memUsed":%d,"swapTotal":%d,"swapUsed":%d,"net":%s}\n' \
